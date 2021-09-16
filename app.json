@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "z-camp-2021",
+    "slug": "z-camp-2021",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "z-camp-2021"
+}
