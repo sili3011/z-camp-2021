@@ -6,8 +6,13 @@ import { createStore } from 'redux';
 import middleware from './middleware';
 import reducers from './reducers';
 import AppWrapper from './components/AppWrapper';
+import { toggleDarkMode } from './actions/settings';
 
 export default class App extends Component {
+
+  componentDidMount() {
+    this.store.dispatch(toggleDarkMode(true));
+  }
 
   store = createStore(reducers, middleware);
 
