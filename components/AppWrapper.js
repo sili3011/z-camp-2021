@@ -4,8 +4,10 @@ import * as eva from '@eva-design/eva';
 import { StyleSheet } from 'react-native';
 import { ApplicationProvider, Layout, Text, Button, Icon, Popover } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
-import { LineChart } from "react-native-chart-kit";
-import { Dimensions } from "react-native";
+import { LineChart } from 'react-native-chart-kit';
+import { Dimensions } from 'react-native';
+import { addDataPoint } from '../actions/data'
+import { StatusBar } from 'react-native';
 
 class AppWrapper extends Component {
 
@@ -44,23 +46,24 @@ class AppWrapper extends Component {
   }
 
   render() {
+    console.log(StatusBar.currentHeight)
     const isDark = this.props.isDark;
     const screenWidth = Dimensions.get("window").width;
 
     const ModeIcon = (props) => (
-      <Icon {...props} style={styles.icon} name={isDark ? 'sun-outline' : 'moon-outline'} fill='#8F9BB3'/>
+      <Icon {...props} name={isDark ? 'sun-outline' : 'moon-outline'} fill='#8F9BB3'/>
     );
 
     const StreamIcon = (props) => (
-      <Icon {...props} style={styles.icon} name='trending-up-outline' fill='#8F9BB3'/>
+      <Icon {...props} name='trending-up-outline' fill='#8F9BB3'/>
     );
 
     const BatchIcon = (props) => (
-      <Icon {...props} style={styles.icon} name='arrow-circle-down-outline' fill='#8F9BB3'/>
+      <Icon {...props} name='arrow-circle-down-outline' fill='#8F9BB3'/>
     );
 
     const SettingsIcon = (props) => (
-      <Icon {...props} style={styles.icon} name='settings-outline' fill='#8F9BB3'/>
+      <Icon {...props} name='settings-outline' fill='#8F9BB3'/>
     );
 
     const SettingsButton = (props) => (
@@ -123,7 +126,8 @@ class AppWrapper extends Component {
 
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-        <Layout>
+        <StatusBar></StatusBar>
+        <Layout style={{marginTop: StatusBar.currentHeight}}>
           <Popover
             visible={this.state.visible}
             anchor={SettingsButton}
@@ -180,14 +184,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   button: {
-    margin: 100,
-    width: 128,
-    height: 128,
     borderRadius: 33
-  },
-  icon: {
-    width: 32,
-    height: 32
   },
   lineChart: {
     padding: 20
