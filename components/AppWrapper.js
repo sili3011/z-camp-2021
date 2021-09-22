@@ -81,8 +81,9 @@ class AppWrapper extends Component {
       backgroundGradientFromOpacity: 1,
       backgroundGradientTo: isDark ? "#222B45": "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientToOpacity: 1,
-      fillShadowGradient: isDark ? "#F7F9FC": "#F7F9FC", // ui kitten color dark: 'color-basic-200' (light: #F7F9FC)
-      color: (opacity = 1) => `rgba(242, 248, 255, ${opacity})`,
+      fillShadowGradient: isDark ? "#F7F9FC": "#2E3A59", // ui kitten color dark: 'color-basic-200' - light: 'color-basic-700' (#2E3A59)
+      // ui kitten color dark: 'color-info-100' (#F2F8FF) - light: 'color-info-900' (#002885)
+      color: (opacity = 1) => isDark ? `rgba(242, 248, 255, ${opacity})` : `rgba(0, 40, 133, ${opacity})`,
       barPercentage: 0.5,
       useShadowColorFromDataset: false // optional
     };
@@ -92,12 +93,14 @@ class AppWrapper extends Component {
       datasets: [
         {
           data: [],
-          color: (opacity = 1) => `rgba(179, 255, 214, ${opacity})`, // ui kitten color dark & light: 'color-success-200' (#B3FFD6)
+          //  ui kitten color dark: 'color-success-200' (#B3FFD6) - light: 'color-success-800' (#007566)
+          color: (opacity = 1) => isDark ? `rgba(179, 255, 214, ${opacity})` : `rgba(0, 117, 102, ${opacity})`,
           strokeWidth: 3 // optional
         },
         {
           data: [],
-          color: (opacity = 1) => `rgba(255, 214, 217, ${opacity})`, // ui kitten color dark & light: 'color-danger-200' (#FFD6D9)
+          // ui kitten color dark & light: 'color-danger-200' (#FFD6D9) - light: 'color-danger-800' (#94124E)
+          color: (opacity = 1) => isDark ? `rgba(255, 214, 217, ${opacity})` : `rgba(148, 18, 78, ${opacity})`, 
           strokeWidth: 3
         }
       ],
@@ -128,7 +131,7 @@ class AppWrapper extends Component {
         <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? '#222b45' : 'white'}>
           <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? '#222b45' : 'white'}></StatusBar>
         </View>
-        <Layout marginTop={Platform.OS !== 'ios' ? Constants.statusBarHeight : 0}>
+        <Layout>
           <Popover
             visible={this.state.visible}
             anchor={SettingsButton}
