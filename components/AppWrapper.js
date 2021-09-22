@@ -120,42 +120,6 @@ class AppWrapper extends Component {
       dataTemperature.datasets[1].data = dataHum.slice(dataHum.length - 15);
     }
 
-    /*
-    <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-            <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <ScrollView>
-              <Button
-                  style={styles.button}
-                  appearance='ghost'
-                  accessoryLeft={ModeIcon}
-                  onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
-              />
-              <Button
-                  style={styles.button}
-                  appearance='ghost'
-                  accessoryLeft={StreamIcon}
-                  onPress={() => this.startDataStream()}
-              />
-              <Button
-                  style={styles.button}
-                  appearance='ghost'
-                  accessoryLeft={BatchIcon}
-                  onPress={() => this.batchData()}
-              />
-              { dataAvailable && 
-                <LineChart
-                  verticalLabelRotation={70}
-                  style={styles.lineChart}
-                  data={dataTemperature}
-                  width={screenWidth}
-                  height={400}
-                  chartConfig={chartConfig}
-                />
-              }
-            </ScrollView>
-            </Layout>
-        </ApplicationProvider>
-    */
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
         <StatusBar></StatusBar>
