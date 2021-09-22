@@ -7,7 +7,8 @@ import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import { addDataPoint } from '../actions/data'
-import { StatusBar } from 'react-native';
+import Constants from 'expo-constants';
+import { StatusBar } from 'expo-status-bar';
 
 class AppWrapper extends Component {
 
@@ -46,7 +47,6 @@ class AppWrapper extends Component {
   }
 
   render() {
-    console.log(StatusBar.currentHeight)
     const isDark = this.props.isDark;
     const screenWidth = Dimensions.get("window").width;
     let dataAvailable = false;
@@ -122,8 +122,8 @@ class AppWrapper extends Component {
 
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-        <StatusBar></StatusBar>
-        <Layout style={{marginTop: StatusBar.currentHeight}}>
+        <StatusBar style={isDark ? 'dark' : 'light'}></StatusBar>
+        <Layout style={{marginTop: Constants.statusBarHeight}}>
           <Popover
             visible={this.state.visible}
             anchor={SettingsButton}
