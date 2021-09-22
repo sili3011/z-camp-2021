@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as eva from '@eva-design/eva';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView, View, Platform } from 'react-native';
 import { ApplicationProvider, Layout, Text, Button, Icon, Popover } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
@@ -12,15 +12,15 @@ import { StatusBar } from 'expo-status-bar';
 
 class AppWrapper extends Component {
 
-    state = {
-      visible: false,
-    }
+  state = {
+    visible: false,
+  }
 
-    changeVisibility = (visible) => {
-      this.setState(() => ({
-          visible: visible
-      }));
-    }
+  changeVisibility = (visible) => {
+    this.setState(() => ({
+        visible: visible
+    }));
+  }
 
   startDataStream() {
     //mocking data stream
@@ -122,8 +122,10 @@ class AppWrapper extends Component {
 
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-        <StatusBar style={isDark ? 'dark' : 'light'}></StatusBar>
-        <Layout style={{marginTop: Constants.statusBarHeight}}>
+        <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? '#222b45' : 'white'}>
+          <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? '#222b45' : 'white'}></StatusBar>
+        </View>
+        <Layout marginTop={Platform.OS !== 'ios' ? Constants.statusBarHeight : 0}>
           <Popover
             visible={this.state.visible}
             anchor={SettingsButton}
@@ -131,19 +133,16 @@ class AppWrapper extends Component {
           >
           <Layout style={styles.content}>
             <Button
-              style={styles.button}
               appearance='ghost'
               accessoryLeft={ModeIcon}
               onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
             />
             <Button
-              style={styles.button}
               appearance='ghost'
               accessoryLeft={StreamIcon}
               onPress={() => this.startDataStream()}
             />
             <Button
-              style={styles.button}
               appearance='ghost'
               accessoryLeft={BatchIcon}
               onPress={() => this.batchData()}
@@ -152,7 +151,7 @@ class AppWrapper extends Component {
         </Popover>
         </Layout>
         <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text category='h1'>Z-CAMP</Text>
+          <Text category='h1'>TemHu</Text>
           <ScrollView>
           { dataAvailable && 
                 <LineChart
@@ -176,12 +175,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 4,
     paddingVertical: 8,
-  },
-  button: {
-    margin: 100,
-    width: 28,
-    height: 28,
-    borderRadius: 33
   },
   lineChart: {
     paddingTop: 20,
