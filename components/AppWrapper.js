@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as eva from '@eva-design/eva';
-import { StyleSheet, ScrollView, View, Platform } from 'react-native';
+import { StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
 import { ApplicationProvider, Layout, Text, Button, Icon, Popover } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
@@ -13,12 +13,19 @@ import { StatusBar } from 'expo-status-bar';
 class AppWrapper extends Component {
 
   state = {
-    visible: false,
+    menuVisible: false,
+    settingsVisible: true
   }
 
-  changeVisibility = (visible) => {
+  changeMenuVisibility = (visible) => {
     this.setState(() => ({
-        visible: visible
+        menuVisible: visible
+    }));
+  }
+
+  changeSettingsVisibility = (visible) => {
+    this.setState(() => ({
+        settingsVisible: visible
     }));
   }
 
@@ -72,7 +79,7 @@ class AppWrapper extends Component {
         style={{marginLeft: 'auto'}}
         appearance='ghost'
         accessoryLeft={SettingsIcon}
-        onPress={() => this.changeVisibility(true)}
+        onPress={() => this.changeMenuVisibility(true)}
       />  
     );
 
@@ -131,11 +138,12 @@ class AppWrapper extends Component {
         <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? '#222b45' : 'white'}>
           <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? '#222b45' : 'white'}></StatusBar>
         </View>
-        <Layout>
+        <Layout style={{flexDirection: 'row'}}>
+          <Text style={{marginLeft: 20}} category='h1'>TemHu</Text>
           <Popover
-            visible={this.state.visible}
+            visible={this.state.menuVisible}
             anchor={SettingsButton}
-            onBackdropPress={() => this.changeVisibility(false)}
+            onBackdropPress={() => this.changeMenuVisibility(false)}
           >
           <Layout style={styles.content}>
             <Button
@@ -157,20 +165,29 @@ class AppWrapper extends Component {
         </Popover>
         </Layout>
         <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text category='h1'>TemHu</Text>
           <ScrollView>
           { dataAvailable && 
-                <LineChart
-                  verticalLabelRotation={70}
-                  style={styles.lineChart}
-                  data={dataTemperature}
-                  width={screenWidth}
-                  height={400}
-                  chartConfig={chartConfig}
-                />
-              }
-            </ScrollView>
+            <LineChart
+              verticalLabelRotation={70}
+              style={styles.lineChart}
+              data={dataTemperature}
+              width={screenWidth}
+              height={400}
+              chartConfig={chartConfig}
+            />
+          }
+          </ScrollView>
         </Layout>
+        <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
+          style={{
+              backgroundColor: '#222b45',
+              height: this.state.settingsVisible ? 200 : 40,
+              borderTopWidth: 2,
+              borderTopColor: '#222735',
+              boxShadow: '0px -20px 20px 0px #0000003d'
+            }}>
+          <Icon style={{height: 64, width: 64, alignSelf: 'center', marginTop: -20}} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill='#8F9BB3'/>
+        </TouchableOpacity >
       </ApplicationProvider>
     );
   }
