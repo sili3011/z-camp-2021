@@ -77,11 +77,11 @@ class AppWrapper extends Component {
     );
 
     const chartConfig = {
-      backgroundGradientFrom: "#0057C2",
+      backgroundGradientFrom: isDark ? "#222B45": "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientFromOpacity: 1,
-      backgroundGradientTo: "#0057C2",
+      backgroundGradientTo: isDark ? "#222B45": "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientToOpacity: 1,
-      fillShadowGradient: "#C7E2FF",
+      fillShadowGradient: isDark ? "#F7F9FC": "#F7F9FC", // ui kitten color dark: 'color-basic-200' (light: #F7F9FC)
       color: (opacity = 1) => `rgba(242, 248, 255, ${opacity})`,
       barPercentage: 0.5,
       useShadowColorFromDataset: false // optional
@@ -92,12 +92,12 @@ class AppWrapper extends Component {
       datasets: [
         {
           data: [],
-          color: (opacity = 1) => `rgba(242, 248, 255, ${opacity})`, // optional
+          color: (opacity = 1) => `rgba(179, 255, 214, ${opacity})`, // ui kitten color dark & light: 'color-success-200' (#B3FFD6)
           strokeWidth: 3 // optional
         },
         {
           data: [],
-          color: (opacity = 1) => `rgba(100, 84, 85, ${opacity})`, // optional
+          color: (opacity = 1) => `rgba(255, 214, 217, ${opacity})`, // ui kitten color dark & light: 'color-danger-200' (#FFD6D9)
           strokeWidth: 3
         }
       ],
@@ -109,7 +109,10 @@ class AppWrapper extends Component {
       dataAvailable = true;
       const labels = this.props.data.data.map(a => {
         const date = new Date(a.timestamp);
-        const dateString = /*date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + " " +*/ date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+        const hours = ('0' + date.getHours()).slice(-2);
+        const minutes = ('0' + date.getMinutes()).slice(-2);
+        const seconds = ('0' + date.getSeconds()).slice(-2);
+        const dateString = `${hours}:${minutes}:${seconds}`;
         return dateString;
       });
       dataTemperature.labels = labels.slice(labels.length - 15);
