@@ -2,12 +2,46 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as eva from '@eva-design/eva';
 import { StyleSheet } from 'react-native';
-import { ApplicationProvider, Layout, Text, Button, Icon } from '@ui-kitten/components';
+import { ApplicationProvider, Layout, Text, Button, Icon, Popover } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 
 class AppWrapper extends Component {
+
+    state = {
+      visible: false,
+    }
+
+    changeVisibility = (visible) => {
+      this.setState(() => ({
+          visible: visible
+      }));
+    }
+
+  startDataStream() {
+    //mocking data stream
+    setInterval(() => this.props.dispatch(
+      addDataPoint({
+        timestamp: new Date().getTime(),
+        temperature: Math.random(),
+        humidity: Math.random()
+      })
+    ), 10000);
+  }
+
+  batchData() {
+    //mocking batch data
+    for(let i = 1; i < 11; ++i) {
+      this.props.dispatch(
+        addDataPoint({
+          timestamp: new Date().getTime() - 60000 * i,
+          temperature: Math.random(),
+          humidity: Math.random()
+        })
+      );
+    }
+  }
 
   render() {
     const isDark = this.props.isDark;
@@ -23,6 +57,19 @@ class AppWrapper extends Component {
 
     const BatchIcon = (props) => (
       <Icon {...props} style={styles.icon} name='arrow-circle-down-outline' fill='#8F9BB3'/>
+    );
+
+    const SettingsIcon = (props) => (
+      <Icon {...props} style={styles.icon} name='settings-outline' fill='#8F9BB3'/>
+    );
+
+    const SettingsButton = (props) => (
+      <Button
+        style={{marginLeft: 'auto'}}
+        appearance='ghost'
+        accessoryLeft={SettingsIcon}
+        onPress={() => this.changeVisibility(true)}
+      />  
     );
 
     const chartConfig = {
@@ -75,47 +122,63 @@ class AppWrapper extends Component {
     }
 
     return (
-        <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-            <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
+        <Layout>
+          <Popover
+            visible={this.state.visible}
+            anchor={SettingsButton}
+            onBackdropPress={() => this.changeVisibility(false)}
+          >
+          <Layout style={styles.content}>
             <Button
-                style={styles.button}
-                appearance='ghost'
-                accessoryLeft={ModeIcon}
-                onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
+              style={styles.button}
+              appearance='ghost'
+              accessoryLeft={ModeIcon}
+              onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
             />
             <Button
-                style={styles.button}
-                appearance='ghost'
-                accessoryLeft={StreamIcon}
-                onPress={() => this.startDataStream()}
+              style={styles.button}
+              appearance='ghost'
+              accessoryLeft={StreamIcon}
+              onPress={() => this.startDataStream()}
             />
             <Button
-                style={styles.button}
-                appearance='ghost'
-                accessoryLeft={BatchIcon}
-                onPress={() => this.batchData()}
+              style={styles.button}
+              appearance='ghost'
+              accessoryLeft={BatchIcon}
+              onPress={() => this.batchData()}
             />
-            <LineChart
-              style={styles.lineChart}
-              data={dataTemperature}
-              width={screenWidth}
-              height={300}
-              chartConfig={chartConfig}
-            />
-            <LineChart
-              style={styles.lineChart}
-              data={dataHumitity}
-              width={screenWidth}
-              height={300}
-              chartConfig={chartConfig}
-            />
-            </Layout>
-        </ApplicationProvider>
+          </Layout>
+        </Popover>
+        </Layout>
+        <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Text category='h1'>Z-CAMP</Text>
+          <LineChart
+            style={styles.lineChart}
+            data={dataTemperature}
+            width={screenWidth}
+            height={300}
+            chartConfig={chartConfig}
+          />
+          <LineChart
+            style={styles.lineChart}
+            data={dataHumitity}
+            width={screenWidth}
+            height={300}
+            chartConfig={chartConfig}
+          />
+        </Layout>
+      </ApplicationProvider>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  content: {
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    paddingVertical: 8,
+  },
   button: {
     margin: 100,
     width: 128,
