@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as eva from '@eva-design/eva';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import { ApplicationProvider, Layout, Text, Button, Icon } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from "react-native-chart-kit";
@@ -12,6 +12,7 @@ class AppWrapper extends Component {
   render() {
     const isDark = this.props.isDark;
     const screenWidth = Dimensions.get("window").width;
+    let dataAvailable = false;
 
     const ModeIcon = (props) => (
       <Icon {...props} style={styles.icon} name={isDark ? 'sun-outline' : 'moon-outline'} fill='#8F9BB3'/>
@@ -32,7 +33,6 @@ class AppWrapper extends Component {
       backgroundGradientToOpacity: 1,
       fillShadowGradient: "#C7E2FF",
       color: (opacity = 1) => `rgba(242, 248, 255, ${opacity})`,
-      strokeWidth: 3, // optional, default 3
       barPercentage: 0.5,
       useShadowColorFromDataset: false // optional
     };
@@ -43,72 +43,66 @@ class AppWrapper extends Component {
         {
           data: [],
           color: (opacity = 1) => `rgba(242, 248, 255, ${opacity})`, // optional
-          strokeWidth: 2 // optional
-        }
-      ],
-      legend: ["Temperature"] // optional
-    };
-
-    let dataHumitity = {
-      labels: [],
-      datasets: [
+          strokeWidth: 3 // optional
+        },
         {
           data: [],
-          color: (opacity = 1) => `rgba(242, 248, 255, ${opacity})`, // optional
-          strokeWidth: 2 // optional
+          color: (opacity = 1) => `rgba(100, 84, 85, ${opacity})`, // optional
+          strokeWidth: 3
         }
       ],
-      legend: ["Humidity"] // optional
+      legend: ["Temperature", "Humidity"]
     };
 
 
     if (this.props.data.data && this.props.data.data.length > 0) {
-      dataTemperature.labels = this.props.data.data.map(a => {
+      dataAvailable = true;
+      const labels = this.props.data.data.map(a => {
         const date = new Date(a.timestamp);
-        const dateString = date.getDate() + "." + date.getMonth() + "." + date.getFullYear();
+        const dateString = /*date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + " " +*/ date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
         return dateString;
       });
-      dataTemperature.datasets[0].data = this.props.data.data.map(a => a.temperature);
+      dataTemperature.labels = labels.slice(labels.length - 15);
+      const tempData = this.props.data.data.map(a => a.temperature);
+      dataTemperature.datasets[0].data = tempData.slice(tempData.length - 15);
 
-      dataHumitity.labels = dataTemperature.labels;
-      dataHumitity.datasets[0].data = this.props.data.data.map(a => a.humidity);
+      const dataHum = this.props.data.data.map(a => a.humidity);
+      dataTemperature.datasets[1].data = dataHum.slice(dataHum.length - 15);
     }
 
     return (
         <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
             <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Button
-                style={styles.button}
-                appearance='ghost'
-                accessoryLeft={ModeIcon}
-                onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
-            />
-            <Button
-                style={styles.button}
-                appearance='ghost'
-                accessoryLeft={StreamIcon}
-                onPress={() => this.startDataStream()}
-            />
-            <Button
-                style={styles.button}
-                appearance='ghost'
-                accessoryLeft={BatchIcon}
-                onPress={() => this.batchData()}
-            />
-            <LineChart
-              style={styles.lineChart}
-              data={dataTemperature}
-              width={screenWidth}
-              height={300}
-              chartConfig={chartConfig}
-            />
-            <LineChart
-              style={styles.lineChart}
-              data={dataHumitity}
-              width={screenWidth}
-              height={300}
-              chartConfig={chartConfig}
-            />
+            <ScrollView>
+              <Button
+                  style={styles.button}
+                  appearance='ghost'
+                  accessoryLeft={ModeIcon}
+                  onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
+              />
+              <Button
+                  style={styles.button}
+                  appearance='ghost'
+                  accessoryLeft={StreamIcon}
+                  onPress={() => this.startDataStream()}
+              />
+              <Button
+                  style={styles.button}
+                  appearance='ghost'
+                  accessoryLeft={BatchIcon}
+                  onPress={() => this.batchData()}
+              />
+              { dataAvailable && 
+                <LineChart
+                  verticalLabelRotation={70}
+                  style={styles.lineChart}
+                  data={dataTemperature}
+                  width={screenWidth}
+                  height={400}
+                  chartConfig={chartConfig}
+                />
+              }
+            </ScrollView>
             </Layout>
         </ApplicationProvider>
     );
@@ -118,8 +112,8 @@ class AppWrapper extends Component {
 const styles = StyleSheet.create({
   button: {
     margin: 100,
-    width: 128,
-    height: 128,
+    width: 28,
+    height: 28,
     borderRadius: 33
   },
   icon: {
@@ -127,7 +121,8 @@ const styles = StyleSheet.create({
     height: 32
   },
   lineChart: {
-    padding: 20
+    paddingTop: 20,
+    paddingBottom: 20
   }
 });
 
