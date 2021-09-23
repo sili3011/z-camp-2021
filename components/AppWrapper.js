@@ -181,33 +181,33 @@ class AppWrapper extends Component {
         <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? this.colorConstant : 'white'}>
           <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? this.colorConstant : 'white'}></StatusBar>
         </View>
+        <Layout style={{flexDirection: 'row'}}>
+          <Text style={{marginLeft: 20}} category='h1'>TemHu</Text>
+          <Popover
+            visible={this.state.menuVisible}
+            anchor={SettingsButton}
+            onBackdropPress={() => this.changeMenuVisibility(false)}
+          >
+            <Layout style={styles.content}>
+              <Button
+                appearance='ghost'
+                accessoryLeft={IconBuilder(this.props, isDark ? 'sun-outline' : 'moon-outline')}
+                onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
+              />
+              <Button
+                appearance='ghost'
+                accessoryLeft={IconBuilder(this.props, 'trending-up-outline')}
+                onPress={() => this.startDataStream()}
+              />
+              <Button
+                appearance='ghost'
+                accessoryLeft={IconBuilder(this.props, 'arrow-circle-down-outline')}
+                onPress={() => this.batchData()}
+              />
+            </Layout>
+          </Popover>
+        </Layout>
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-          <Layout style={{flexDirection: 'row'}}>
-            <Text style={{marginLeft: 20}} category='h1'>TemHu</Text>
-            <Popover
-              visible={this.state.menuVisible}
-              anchor={SettingsButton}
-              onBackdropPress={() => this.changeMenuVisibility(false)}
-            >
-              <Layout style={styles.content}>
-                <Button
-                  appearance='ghost'
-                  accessoryLeft={IconBuilder(this.props, isDark ? 'sun-outline' : 'moon-outline')}
-                  onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
-                />
-                <Button
-                  appearance='ghost'
-                  accessoryLeft={IconBuilder(this.props, 'trending-up-outline')}
-                  onPress={() => this.startDataStream()}
-                />
-                <Button
-                  appearance='ghost'
-                  accessoryLeft={IconBuilder(this.props, 'arrow-circle-down-outline')}
-                  onPress={() => this.batchData()}
-                />
-              </Layout>
-            </Popover>
-          </Layout>
           <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ScrollView>
             { dataAvailable && 
@@ -257,6 +257,9 @@ class AppWrapper extends Component {
                 <SelectItem title='Option 2'/>
                 <SelectItem title='Option 3'/>
               </Select>
+              <Button appearance='outline' style={{margin: 'auto', width: '20%', marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
+                EXECUTE
+              </Button>
             </Layout> : undefined}
           </TouchableOpacity>
         </KeyboardAvoidingView>
