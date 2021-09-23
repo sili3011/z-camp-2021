@@ -225,7 +225,7 @@ class AppWrapper extends Component {
           <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
             style={{
               backgroundColor: isDark ? this.colorConstant : 'white',
-              height: this.state.settingsVisible ? 280 : 80,
+              height: this.state.settingsVisible ? 300 : 80,
               borderTopWidth: 2,
               borderTopColor: '#222735',
               boxShadow: '0px -20px 20px 0px #0000003d'
@@ -257,7 +257,7 @@ class AppWrapper extends Component {
                 <SelectItem title='Option 2'/>
                 <SelectItem title='Option 3'/>
               </Select>
-              <Button appearance='outline' style={{margin: 'auto', width: '20%', marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
+              <Button appearance='outline' style={{alignSelf: 'center', width: 'fit-content', marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
                 EXECUTE
               </Button>
             </Layout> : undefined}
