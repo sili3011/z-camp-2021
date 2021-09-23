@@ -32,7 +32,9 @@ export default function CameraWrapper()  {
       <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={styles.barCodeScanner}
-      />
+      >
+        <BarcodeMask />
+      </BarCodeScanner>
       {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
     </View>
   );
