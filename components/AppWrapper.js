@@ -2,19 +2,21 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as eva from '@eva-design/eva';
 import { StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
-import { ApplicationProvider, Layout, Text, Button, Icon, Popover } from '@ui-kitten/components';
+import { ApplicationProvider, Layout, Text, Button, Icon, Popover, Modal, Card } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import { addDataPoint } from '../actions/data'
 import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
+import ScannerWrapper from './ScannerWrapper';
 
 class AppWrapper extends Component {
 
   state = {
     menuVisible: false,
-    settingsVisible: true
+    settingsVisible: true,
+    scannerModalVisible: false
   }
 
   changeMenuVisibility = (visible) => {
@@ -26,6 +28,12 @@ class AppWrapper extends Component {
   changeSettingsVisibility = (visible) => {
     this.setState(() => ({
         settingsVisible: visible
+    }));
+  }
+
+  changeScannerModalVisibility = (visible) => {
+    this.setState(() => ({
+      scannerModalVisible: visible
     }));
   }
 
@@ -166,16 +174,30 @@ class AppWrapper extends Component {
         </Layout>
         <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <ScrollView>
-          { dataAvailable && 
-            <LineChart
-              verticalLabelRotation={70}
-              style={styles.lineChart}
-              data={dataTemperature}
-              width={screenWidth}
-              height={400}
-              chartConfig={chartConfig}
-            />
-          }
+            <Button 
+              onPress={() => this.changeScannerModalVisibility(true)}
+              appearance='outline'>
+              Scan QR Code
+            </Button>
+            <Modal
+              visible={this.state.scannerModalVisible}
+              backdropStyle={styles.backdrop}
+              onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
+                <Card style={styles.scannerCard}>
+                  <ScannerWrapper />
+                  <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
+                </Card>
+            </Modal>
+            { dataAvailable && 
+              <LineChart
+                verticalLabelRotation={70}
+                style={styles.lineChart}
+                data={dataTemperature}
+                width={screenWidth}
+                height={400}
+                chartConfig={chartConfig}
+              />
+            }
           </ScrollView>
         </Layout>
         <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
@@ -201,6 +223,15 @@ const styles = StyleSheet.create({
   },
   lineChart: {
     paddingTop: 20,
+    paddingBottom: 20
+  },
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  scannerCard: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingBottom: 20
   }
 });
