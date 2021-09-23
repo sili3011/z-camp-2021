@@ -21,7 +21,8 @@ import {
   Select,
   SelectItem,
   Modal,
-  Card } from '@ui-kitten/components';
+  Card,
+  IndexPath } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
@@ -32,7 +33,8 @@ import ScannerWrapper from './ScannerWrapper';
 
 class AppWrapper extends Component {
 
-  colorConstant = '#222b45';
+  colorConstantBackground = '#222b45';
+  colorConstantElements = '#8F9BB3'
 
   state = {
     menuVisible: false,
@@ -41,7 +43,8 @@ class AppWrapper extends Component {
     autocompleteInput: '',
     selectedDevice: '',
     dateRange: '',
-    selectedFunction: 0
+    selectedFunction: new IndexPath(0),
+    selectedBucket: new IndexPath(0)
   }
 
   changeMenuVisibility = (visible) => {
@@ -78,6 +81,12 @@ class AppWrapper extends Component {
   changeSelectedFunction = (selectedFunction) => {
     this.setState(() => ({
       selectedFunction: selectedFunction
+    }));
+  }
+
+  changeSelectedBucket = (selectedBucket) => {
+    this.setState(() => ({
+      selectedBucket: selectedBucket
     }));
   }
 
@@ -141,7 +150,7 @@ class AppWrapper extends Component {
     let dataAvailable = false;
 
     const IconBuilder = (props, icon) => (
-      <Icon {...props} name={icon} fill='#8F9BB3'/>
+      <Icon {...props} name={icon} fill={this.colorConstantElements}/>
     );
 
     const SettingsButton = (props) => (
@@ -154,15 +163,18 @@ class AppWrapper extends Component {
     );
 
     const chartConfig = {
-      backgroundGradientFrom: isDark ? this.colorConstant: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
+      backgroundGradientFrom: isDark ? this.colorConstantBackground: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientFromOpacity: 1,
-      backgroundGradientTo: isDark ? this.colorConstant: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
+      backgroundGradientTo: isDark ? this.colorConstantBackground: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientToOpacity: 1,
       fillShadowGradient: isDark ? "#F7F9FC": "#2E3A59", // ui kitten color dark: 'color-basic-200' - light: 'color-basic-700' (#2E3A59)
       // ui kitten color dark: 'color-info-100' (#F2F8FF) - light: 'color-info-900' (#002885)
       color: (opacity = 1) => isDark ? `rgba(242, 248, 255, ${opacity})` : `rgba(0, 40, 133, ${opacity})`,
       barPercentage: 0.5,
-      useShadowColorFromDataset: false // optional
+      useShadowColorFromDataset: false, // optional
+      propsForLabels: {
+        fontFamily: 'Helvetica'
+      }
     };
 
     let dataTemperature = {
@@ -229,8 +241,8 @@ class AppWrapper extends Component {
 
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-        <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? this.colorConstant : 'white'}>
-          <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? this.colorConstant : 'white'}></StatusBar>
+        <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? this.colorConstantBackground : 'white'}>
+          <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? this.colorConstantBackground : 'white'}></StatusBar>
         </View>
         <Layout style={{flexDirection: 'row'}}>
           <Text style={{marginLeft: 20}} category='h1'>TemHu</Text>
@@ -245,16 +257,19 @@ class AppWrapper extends Component {
                 accessoryLeft={IconBuilder(this.props, isDark ? 'sun-outline' : 'moon-outline')}
                 onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
               />
-              <Button
-                appearance='ghost'
-                accessoryLeft={IconBuilder(this.props, 'trending-up-outline')}
-                onPress={() => this.startDataStream()}
-              />
-              <Button
-                appearance='ghost'
-                accessoryLeft={IconBuilder(this.props, 'arrow-circle-down-outline')}
-                onPress={() => this.batchData()}
-              />
+              { __DEV__ ?
+              <Layout>
+                <Button
+                  appearance='ghost'
+                  accessoryLeft={IconBuilder(this.props, 'trending-up-outline')}
+                  onPress={() => this.startDataStream()}
+                />
+                <Button
+                  appearance='ghost'
+                  accessoryLeft={IconBuilder(this.props, 'arrow-circle-down-outline')}
+                  onPress={() => this.batchData()}
+                />
+              </Layout>: undefined}
             </Layout>
           </Popover>
         </Layout>
@@ -273,67 +288,74 @@ class AppWrapper extends Component {
                 chartConfig={chartConfig}
               />
             }
-          </ScrollView>
-        </Layout>
-        <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
-          style={{
-              backgroundColor: '#222b45',
-              height: this.state.settingsVisible ? 200 : 40,
+            </ScrollView>
+          </Layout>
+          <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
+            style={{
+              backgroundColor: isDark ? this.colorConstantBackground : 'white',
+              height: this.state.settingsVisible ? 350 : 80,
               borderTopWidth: 2,
               borderTopColor: '#222735',
               boxShadow: '0px -20px 20px 0px #0000003d'
             }}>
-            <Icon style={styles.autocomplete} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill='#8F9BB3'/>
+            <Icon style={styles.autocomplete} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill={this.colorConstantElements}/>
             {this.state.settingsVisible ?
             <Layout style={{margin: 20}}>
               <ScrollView>
-              <Autocomplete
-                placeholder='Enter device ID (no ID will aggregate all devices)'
-                value={this.state.autocompleteInput}
-                accessoryRight={renderAutocompleteReset}
-                onChangeText={this.changeAutocompleteInput}
-                onSelect={this.changeSelectedDevice}>
-                {this.props.devices && this.state.autocompleteInput ? this.props.devices.filter(device => device.includes(this.state.autocompleteInput)).map(renderAutocompleteItem) : []}
-              </Autocomplete>
-              <Text appearance='hint' style={styles.hintText}>
-                {`Number of available devices: ${this.props.devices?.length}`}
-              </Text>
-              <RangeDatepicker
-                range={this.state.dateRange}
-                onSelect={nextRange => this.changeDateRange(nextRange)}
-                placeholder='Time range'
-                accessoryRight={renderDateRangeReset}
-              />
-              <Select
-                selectedIndex={this.state.selectedFunction}
-                onSelect={index => this.changeSelectedFunction(index)}
-                style={{marginTop: 10}}>
-                <SelectItem title='Option 1'/>
-                <SelectItem title='Option 2'/>
-                <SelectItem title='Option 3'/>
-              </Select>
-              <Button 
-                onPress={() => this.changeScannerModalVisibility(true)}
-                appearance='outline'
-                style={{alignSelf: 'center', width: 150, marginTop: 10}}>
-                Scan QR Code
-              </Button>
-              <Modal
-                visible={this.state.scannerModalVisible}
-                backdropStyle={styles.backdrop}
-                onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
-                  <Card style={styles.scannerCard}>
-                    <ScannerWrapper />
-                    <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
-                  </Card>
-              </Modal>
-              <Button 
-                appearance='outline' 
-                style={{alignSelf: 'center', width: 150, marginTop: 10}} 
-                onPress={() => this.batchData()} 
-                disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
-                EXECUTE
-              </Button>
+                <Layout style={{flexDirection: 'row'}}>
+                  <Layout style={{width: screenWidth - 160}}>
+                    <Autocomplete
+                      placeholder='Enter device ID (no ID will aggregate all devices)'
+                      value={this.state.autocompleteInput}
+                      accessoryRight={renderAutocompleteReset}
+                      onChangeText={this.changeAutocompleteInput}
+                      onSelect={this.changeSelectedDevice}>
+                      {this.props.devices && this.state.autocompleteInput ? this.props.devices.filter(device => device.includes(this.state.autocompleteInput)).map(renderAutocompleteItem) : []}
+                    </Autocomplete>
+                  </Layout>
+                  <Button 
+                    onPress={() => this.changeScannerModalVisibility(true)}
+                    appearance='outline' size='small'>
+                      Scan QR Code
+                  </Button>
+                  <Modal
+                    visible={this.state.scannerModalVisible}
+                    backdropStyle={styles.backdrop}
+                    onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
+                    <Card style={styles.scannerCard}>
+                      <ScannerWrapper />
+                      <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
+                    </Card>
+                  </Modal>
+                </Layout>
+                <Text appearance='hint' style={styles.hintText}>
+                  {`Number of available devices: ${this.props.devices?.length}`}
+                </Text>
+                <Select
+                  selectedIndex={this.state.selectedBucket}
+                  onSelect={index => this.changeSelectedBucket(index)}
+                  style={{marginBottom: 10}}>
+                  <SelectItem title='Option 1'/>
+                  <SelectItem title='Option 2'/>
+                  <SelectItem title='Option 3'/>
+                </Select>
+                <RangeDatepicker
+                  range={this.state.dateRange}
+                  onSelect={nextRange => this.changeDateRange(nextRange)}
+                  placeholder='Time range'
+                  accessoryRight={renderDateRangeReset}
+                />
+                <Select
+                  selectedIndex={this.state.selectedFunction}
+                  onSelect={index => this.changeSelectedFunction(index)}
+                  style={{marginTop: 10}}>
+                  <SelectItem title='Option 1'/>
+                  <SelectItem title='Option 2'/>
+                  <SelectItem title='Option 3'/>
+                </Select>
+                <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.dateRange === ''}>
+                  EXECUTE
+                </Button>
               </ScrollView>
             </Layout> : undefined}
           </TouchableOpacity>
