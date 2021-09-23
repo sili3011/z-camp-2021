@@ -269,57 +269,60 @@ class AppWrapper extends Component {
             {this.state.settingsVisible ?
             <Layout style={{margin: 20}}>
               <ScrollView>
-              <Autocomplete
-                placeholder='Enter device ID (no ID will aggregate all devices)'
-                value={this.state.autocompleteInput}
-                accessoryRight={renderAutocompleteReset}
-                onChangeText={this.changeAutocompleteInput}
-                onSelect={this.changeSelectedDevice}>
-                {this.props.devices && this.state.autocompleteInput ? this.props.devices.filter(device => device.includes(this.state.autocompleteInput)).map(renderAutocompleteItem) : []}
-              </Autocomplete>
-              <Text appearance='hint' style={styles.hintText}>
-                {`Number of available devices: ${this.props.devices?.length}`}
-              </Text>
-              <Select
-                selectedIndex={this.state.selectedBucket}
-                onSelect={index => this.changeSelectedBucket(index)}
-                style={{marginBottom: 10}}>
-                <SelectItem title='Option 1'/>
-                <SelectItem title='Option 2'/>
-                <SelectItem title='Option 3'/>
-              </Select>
-              <RangeDatepicker
-                range={this.state.dateRange}
-                onSelect={nextRange => this.changeDateRange(nextRange)}
-                placeholder='Time range'
-                accessoryRight={renderDateRangeReset}
-              />
-              <Select
-                selectedIndex={this.state.selectedFunction}
-                onSelect={index => this.changeSelectedFunction(index)}
-                style={{marginTop: 10}}>
-                <SelectItem title='Option 1'/>
-                <SelectItem title='Option 2'/>
-                <SelectItem title='Option 3'/>
-              </Select>
-              <Button 
-                onPress={() => this.changeScannerModalVisibility(true)}
-                appearance='outline'
-                style={{alignSelf: 'center', width: 150, marginTop: 10}}>
-                Scan QR Code
-              </Button>
-              <Modal
-                visible={this.state.scannerModalVisible}
-                backdropStyle={styles.backdrop}
-                onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
-                  <Card style={styles.scannerCard}>
-                    <ScannerWrapper />
-                    <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
-                  </Card>
-              </Modal>
-              <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.dateRange === ''}>
-                EXECUTE
-              </Button>
+                <Layout style={{flexDirection: 'row'}}>
+                  <Layout style={{width: screenWidth - 160}}>
+                    <Autocomplete
+                      placeholder='Enter device ID (no ID will aggregate all devices)'
+                      value={this.state.autocompleteInput}
+                      accessoryRight={renderAutocompleteReset}
+                      onChangeText={this.changeAutocompleteInput}
+                      onSelect={this.changeSelectedDevice}>
+                      {this.props.devices && this.state.autocompleteInput ? this.props.devices.filter(device => device.includes(this.state.autocompleteInput)).map(renderAutocompleteItem) : []}
+                    </Autocomplete>
+                  </Layout>
+                  <Button 
+                    onPress={() => this.changeScannerModalVisibility(true)}
+                    appearance='outline' size='small'>
+                    Scan QR Code
+                  </Button>
+                  <Modal
+                    visible={this.state.scannerModalVisible}
+                    backdropStyle={styles.backdrop}
+                    onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
+                    <Card style={styles.scannerCard}>
+                      <ScannerWrapper />
+                      <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
+                    </Card>
+                  </Modal>
+                </Layout>
+                <Text appearance='hint' style={styles.hintText}>
+                  {`Number of available devices: ${this.props.devices?.length}`}
+                </Text>
+                <Select
+                  selectedIndex={this.state.selectedBucket}
+                  onSelect={index => this.changeSelectedBucket(index)}
+                  style={{marginBottom: 10}}>
+                  <SelectItem title='Option 1'/>
+                  <SelectItem title='Option 2'/>
+                  <SelectItem title='Option 3'/>
+                </Select>
+                <RangeDatepicker
+                  range={this.state.dateRange}
+                  onSelect={nextRange => this.changeDateRange(nextRange)}
+                  placeholder='Time range'
+                  accessoryRight={renderDateRangeReset}
+                />
+                <Select
+                  selectedIndex={this.state.selectedFunction}
+                  onSelect={index => this.changeSelectedFunction(index)}
+                  style={{marginTop: 10}}>
+                  <SelectItem title='Option 1'/>
+                  <SelectItem title='Option 2'/>
+                  <SelectItem title='Option 3'/>
+                </Select>
+                <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.dateRange === ''}>
+                  EXECUTE
+                </Button>
               </ScrollView>
             </Layout> : undefined}
           </TouchableOpacity>
