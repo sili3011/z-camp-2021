@@ -233,16 +233,19 @@ class AppWrapper extends Component {
                 accessoryLeft={IconBuilder(this.props, isDark ? 'sun-outline' : 'moon-outline')}
                 onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
               />
-              <Button
-                appearance='ghost'
-                accessoryLeft={IconBuilder(this.props, 'trending-up-outline')}
-                onPress={() => this.startDataStream()}
-              />
-              <Button
-                appearance='ghost'
-                accessoryLeft={IconBuilder(this.props, 'arrow-circle-down-outline')}
-                onPress={() => this.batchData()}
-              />
+              { __DEV__ ?
+              <Layout>
+                <Button
+                  appearance='ghost'
+                  accessoryLeft={IconBuilder(this.props, 'trending-up-outline')}
+                  onPress={() => this.startDataStream()}
+                />
+                <Button
+                  appearance='ghost'
+                  accessoryLeft={IconBuilder(this.props, 'arrow-circle-down-outline')}
+                  onPress={() => this.batchData()}
+                />
+              </Layout>: undefined}
             </Layout>
           </Popover>
         </Layout>
