@@ -73,6 +73,9 @@ class AppWrapper extends Component {
     this.setState(() => ({
       autocompleteInput: value
     }));
+    if(this.state.scannerModalVisible) {
+      this.changeScannerModalVisibility(false);
+    }
   }
 
   changeSelectedDevice = (deviceIndex) => {
@@ -352,7 +355,7 @@ class AppWrapper extends Component {
                     backdropStyle={styles.backdrop}
                     onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
                     <Card style={styles.scannerCard}>
-                      <ScannerWrapper />
+                      <ScannerWrapper onIDDetected={(data) => this.changeAutocompleteInput(data)}/>
                       <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
                     </Card>
                   </Modal>
