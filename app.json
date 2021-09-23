@@ -1,11 +1,9 @@
 {
   "expo": {
-    "name": "z-camp-2021",
-    "slug": "z-camp-2021",
+    "name": "TemHu",
+    "slug": "TemHu",
     "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
+    "assetBundlePatterns": ["**/*"]
   },
-  "name": "z-camp-2021"
+  "name": "TemHu"
 }
