@@ -120,9 +120,9 @@ class AppWrapper extends Component {
     );
 
     const chartConfig = {
-      backgroundGradientFrom: isDark ? "#222B45": "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
+      backgroundGradientFrom: isDark ? this.colorConstant: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientFromOpacity: 1,
-      backgroundGradientTo: isDark ? "#222B45": "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
+      backgroundGradientTo: isDark ? this.colorConstant: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientToOpacity: 1,
       fillShadowGradient: isDark ? "#F7F9FC": "#2E3A59", // ui kitten color dark: 'color-basic-200' - light: 'color-basic-700' (#2E3A59)
       // ui kitten color dark: 'color-info-100' (#F2F8FF) - light: 'color-info-900' (#002885)
@@ -150,7 +150,6 @@ class AppWrapper extends Component {
       legend: ["Temperature", "Humidity"]
     };
 
-
     if (this.props.data.data && this.props.data.data.length > 0) {
       dataAvailable = true;
       const labels = this.props.data.data.map(a => {
@@ -175,6 +174,24 @@ class AppWrapper extends Component {
         title={item}
       />
     );
+
+    const renderAutocompleteReset = () => {
+      return <Button
+        appearance='ghost'
+        accessoryLeft={IconBuilder(this.props, 'close')}
+        onPress={() => this.changeAutocompleteInput('')}
+        size='tiny'
+      />
+    }
+
+    const renderDateRangeReset = () => {
+      return <Button
+        appearance='ghost'
+        accessoryLeft={IconBuilder(this.props, 'close')}
+        onPress={() => this.changeDateRange('')}
+        size='tiny'
+      />
+    }
 
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
@@ -236,7 +253,7 @@ class AppWrapper extends Component {
               <Autocomplete
                 placeholder='Enter device ID (no ID will aggregate all devices)'
                 value={this.state.autocompleteInput}
-                accessoryRight={IconBuilder(this.props, 'close')}
+                accessoryRight={renderAutocompleteReset}
                 onChangeText={this.changeAutocompleteInput}
                 onSelect={this.changeSelectedDevice}>
                 {this.props.devices && this.state.autocompleteInput ? this.props.devices.filter(device => device.includes(this.state.autocompleteInput)).map(renderAutocompleteItem) : []}
@@ -248,6 +265,7 @@ class AppWrapper extends Component {
                 range={this.state.dateRange}
                 onSelect={nextRange => this.changeDateRange(nextRange)}
                 placeholder='Time range'
+                accessoryRight={renderDateRangeReset}
               />
               <Select
                 selectedIndex={this.state.selectedFunction}
@@ -257,7 +275,7 @@ class AppWrapper extends Component {
                 <SelectItem title='Option 2'/>
                 <SelectItem title='Option 3'/>
               </Select>
-              <Button appearance='outline' style={{alignSelf: 'center', width: 'fit-content', marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
+              <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
                 EXECUTE
               </Button>
             </Layout> : undefined}
