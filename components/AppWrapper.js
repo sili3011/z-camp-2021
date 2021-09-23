@@ -1,8 +1,27 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as eva from '@eva-design/eva';
-import { StyleSheet, ScrollView, View, TouchableOpacity } from 'react-native';
-import { ApplicationProvider, Layout, Text, Button, Icon, Popover, Modal, Card } from '@ui-kitten/components';
+import { 
+  StyleSheet,
+  ScrollView,
+  View,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform } from 'react-native';
+import { 
+  ApplicationProvider,
+  Layout,
+  Text,
+  Button,
+  Icon,
+  Popover,
+  Autocomplete,
+  AutocompleteItem,
+  RangeDatepicker,
+  Select,
+  SelectItem,
+  Modal,
+  Card } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
@@ -13,21 +32,52 @@ import ScannerWrapper from './ScannerWrapper';
 
 class AppWrapper extends Component {
 
+  colorConstant = '#222b45';
+
   state = {
     menuVisible: false,
     settingsVisible: true,
-    scannerModalVisible: false
+    scannerModalVisible: false,
+    autocompleteInput: '',
+    selectedDevice: '',
+    dateRange: '',
+    selectedFunction: 0
   }
 
   changeMenuVisibility = (visible) => {
     this.setState(() => ({
-        menuVisible: visible
+      menuVisible: visible
     }));
   }
 
   changeSettingsVisibility = (visible) => {
     this.setState(() => ({
-        settingsVisible: visible
+      settingsVisible: visible
+    }));
+  }
+
+  changeAutocompleteInput = (value) => {
+    this.setState(() => ({
+      autocompleteInput: value
+    }));
+  }
+
+  changeSelectedDevice = (deviceIndex) => {
+    this.setState(() => ({
+      selectedDevice: this.props.devices[deviceIndex],
+      autocompleteInput: this.props.devices[deviceIndex]
+    }));
+  }
+
+  changeDateRange = (dateRange) => {
+    this.setState(() => ({
+      dateRange: dateRange
+    }));
+  }
+
+  changeSelectedFunction = (selectedFunction) => {
+    this.setState(() => ({
+      selectedFunction: selectedFunction
     }));
   }
 
@@ -66,27 +116,15 @@ class AppWrapper extends Component {
     const screenWidth = Dimensions.get("window").width;
     let dataAvailable = false;
 
-    const ModeIcon = (props) => (
-      <Icon {...props} name={isDark ? 'sun-outline' : 'moon-outline'} fill='#8F9BB3'/>
-    );
-
-    const StreamIcon = (props) => (
-      <Icon {...props} name='trending-up-outline' fill='#8F9BB3'/>
-    );
-
-    const BatchIcon = (props) => (
-      <Icon {...props} name='arrow-circle-down-outline' fill='#8F9BB3'/>
-    );
-
-    const SettingsIcon = (props) => (
-      <Icon {...props} name='settings-outline' fill='#8F9BB3'/>
+    const IconBuilder = (props, icon) => (
+      <Icon {...props} name={icon} fill='#8F9BB3'/>
     );
 
     const SettingsButton = (props) => (
       <Button
         style={{marginLeft: 'auto'}}
         appearance='ghost'
-        accessoryLeft={SettingsIcon}
+        accessoryLeft={IconBuilder(props, 'settings-outline')}
         onPress={() => this.changeMenuVisibility(true)}
       />  
     );
@@ -141,10 +179,17 @@ class AppWrapper extends Component {
       dataTemperature.datasets[1].data = dataHum.slice(dataHum.length - 15);
     }
 
+    const renderAutocompleteItem = (item, index) => (
+      <AutocompleteItem
+        key={index}
+        title={item}
+      />
+    );
+
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-        <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? '#222b45' : 'white'}>
-          <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? '#222b45' : 'white'}></StatusBar>
+        <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? this.colorConstant : 'white'}>
+          <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? this.colorConstant : 'white'}></StatusBar>
         </View>
         <Layout style={{flexDirection: 'row'}}>
           <Text style={{marginLeft: 20}} category='h1'>TemHu</Text>
@@ -153,41 +198,28 @@ class AppWrapper extends Component {
             anchor={SettingsButton}
             onBackdropPress={() => this.changeMenuVisibility(false)}
           >
-          <Layout style={styles.content}>
-            <Button
-              appearance='ghost'
-              accessoryLeft={ModeIcon}
-              onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
-            />
-            <Button
-              appearance='ghost'
-              accessoryLeft={StreamIcon}
-              onPress={() => this.startDataStream()}
-            />
-            <Button
-              appearance='ghost'
-              accessoryLeft={BatchIcon}
-              onPress={() => this.batchData()}
-            />
-          </Layout>
-        </Popover>
+            <Layout style={styles.content}>
+              <Button
+                appearance='ghost'
+                accessoryLeft={IconBuilder(this.props, isDark ? 'sun-outline' : 'moon-outline')}
+                onPress={() => this.props.dispatch(toggleDarkMode(!isDark))}
+              />
+              <Button
+                appearance='ghost'
+                accessoryLeft={IconBuilder(this.props, 'trending-up-outline')}
+                onPress={() => this.startDataStream()}
+              />
+              <Button
+                appearance='ghost'
+                accessoryLeft={IconBuilder(this.props, 'arrow-circle-down-outline')}
+                onPress={() => this.batchData()}
+              />
+            </Layout>
+          </Popover>
         </Layout>
-        <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <ScrollView>
-            <Button 
-              onPress={() => this.changeScannerModalVisibility(true)}
-              appearance='outline'>
-              Scan QR Code
-            </Button>
-            <Modal
-              visible={this.state.scannerModalVisible}
-              backdropStyle={styles.backdrop}
-              onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
-                <Card style={styles.scannerCard}>
-                  <ScannerWrapper />
-                  <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
-                </Card>
-            </Modal>
+        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+          <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <ScrollView>
             { dataAvailable && 
               <LineChart
                 verticalLabelRotation={70}
@@ -208,8 +240,60 @@ class AppWrapper extends Component {
               borderTopColor: '#222735',
               boxShadow: '0px -20px 20px 0px #0000003d'
             }}>
-          <Icon style={{height: 64, width: 64, alignSelf: 'center', marginTop: -20}} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill='#8F9BB3'/>
-        </TouchableOpacity >
+            <Icon style={styles.autocomplete} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill='#8F9BB3'/>
+            {this.state.settingsVisible ?
+            <Layout style={{margin: 20}}>
+              <ScrollView>
+              <Autocomplete
+                placeholder='Enter device ID (no ID will aggregate all devices)'
+                value={this.state.autocompleteInput}
+                accessoryRight={IconBuilder(this.props, 'close')}
+                onChangeText={this.changeAutocompleteInput}
+                onSelect={this.changeSelectedDevice}>
+                {this.props.devices && this.state.autocompleteInput ? this.props.devices.filter(device => device.includes(this.state.autocompleteInput)).map(renderAutocompleteItem) : []}
+              </Autocomplete>
+              <Text appearance='hint' style={styles.hintText}>
+                {`Number of available devices: ${this.props.devices?.length}`}
+              </Text>
+              <RangeDatepicker
+                range={this.state.dateRange}
+                onSelect={nextRange => this.changeDateRange(nextRange)}
+                placeholder='Time range'
+              />
+              <Select
+                selectedIndex={this.state.selectedFunction}
+                onSelect={index => this.changeSelectedFunction(index)}
+                style={{marginTop: 10}}>
+                <SelectItem title='Option 1'/>
+                <SelectItem title='Option 2'/>
+                <SelectItem title='Option 3'/>
+              </Select>
+              <Button 
+                onPress={() => this.changeScannerModalVisibility(true)}
+                appearance='outline'
+                style={{alignSelf: 'center', width: 150, marginTop: 10}}>
+                Scan QR Code
+              </Button>
+              <Modal
+                visible={this.state.scannerModalVisible}
+                backdropStyle={styles.backdrop}
+                onBackdropPress={() => this.changeScannerModalVisibility(!this.state.scannerModalVisible)}>
+                  <Card style={styles.scannerCard}>
+                    <ScannerWrapper />
+                    <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
+                  </Card>
+              </Modal>
+              <Button 
+                appearance='outline' 
+                style={{alignSelf: 'center', width: 150, marginTop: 10}} 
+                onPress={() => this.batchData()} 
+                disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
+                EXECUTE
+              </Button>
+              </ScrollView>
+            </Layout> : undefined}
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </ApplicationProvider>
     );
   }
@@ -233,14 +317,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingBottom: 20
+  },
+  autocomplete: {
+    height: 32,
+    width: 32,
+    alignSelf:'center'
+  },
+  hintText: {
+    marginLeft: 10,
+    marginTop: 3,
+    marginBottom: 10,
+    fontSize: 10
   }
 });
 
 function mapStateToProps ({settings, data}) {
-    return {
-        isDark: settings.isDark,
-        data: data
-    }
+  return {
+    isDark: settings.isDark,
+    data: data,
+    devices: data.devices
+  }
 }
 
 export default connect(mapStateToProps)(AppWrapper);

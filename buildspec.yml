@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - npm i
+      - npm install -g expo-cli
+      #- aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 023575240500.dkr.ecr.eu-west-1.amazonaws.com
+  build:
+    commands:
+      - expo build:web
+      #- docker build -t 023575240500.dkr.ecr.eu-west-1.amazonaws.com/frontend:$CODEBUILD_BUILD_NUMBER .
+  # post_build:
+  #   commands:
+  #     - docker push 023575240500.dkr.ecr.eu-west-1.amazonaws.com/frontend:$CODEBUILD_BUILD_NUMBER
