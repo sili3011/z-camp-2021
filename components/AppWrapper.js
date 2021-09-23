@@ -21,7 +21,8 @@ import {
   Select,
   SelectItem,
   Modal,
-  Card } from '@ui-kitten/components';
+  Card,
+  IndexPath } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
@@ -41,7 +42,8 @@ class AppWrapper extends Component {
     autocompleteInput: '',
     selectedDevice: '',
     dateRange: '',
-    selectedFunction: 0
+    selectedFunction: new IndexPath(0),
+    selectedBucket: new IndexPath(0)
   }
 
   changeMenuVisibility = (visible) => {
@@ -78,6 +80,12 @@ class AppWrapper extends Component {
   changeSelectedFunction = (selectedFunction) => {
     this.setState(() => ({
       selectedFunction: selectedFunction
+    }));
+  }
+
+  changeSelectedBucket = (selectedBucket) => {
+    this.setState(() => ({
+      selectedBucket: selectedBucket
     }));
   }
 
@@ -247,12 +255,12 @@ class AppWrapper extends Component {
                 chartConfig={chartConfig}
               />
             }
-          </ScrollView>
-        </Layout>
-        <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
-          style={{
-              backgroundColor: '#222b45',
-              height: this.state.settingsVisible ? 200 : 40,
+            </ScrollView>
+          </Layout>
+          <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
+            style={{
+              backgroundColor: isDark ? this.colorConstant : 'white',
+              height: this.state.settingsVisible ? 350 : 80,
               borderTopWidth: 2,
               borderTopColor: '#222735',
               boxShadow: '0px -20px 20px 0px #0000003d'
@@ -272,6 +280,14 @@ class AppWrapper extends Component {
               <Text appearance='hint' style={styles.hintText}>
                 {`Number of available devices: ${this.props.devices?.length}`}
               </Text>
+              <Select
+                selectedIndex={this.state.selectedBucket}
+                onSelect={index => this.changeSelectedBucket(index)}
+                style={{marginBottom: 10}}>
+                <SelectItem title='Option 1'/>
+                <SelectItem title='Option 2'/>
+                <SelectItem title='Option 3'/>
+              </Select>
               <RangeDatepicker
                 range={this.state.dateRange}
                 onSelect={nextRange => this.changeDateRange(nextRange)}
@@ -301,11 +317,7 @@ class AppWrapper extends Component {
                     <Button onPress={() => this.changeScannerModalVisibility(false)}>Cancel</Button>
                   </Card>
               </Modal>
-              <Button 
-                appearance='outline' 
-                style={{alignSelf: 'center', width: 150, marginTop: 10}} 
-                onPress={() => this.batchData()} 
-                disabled={this.state.selectedDevice === '' || this.state.dateRange === ''}>
+              <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.dateRange === ''}>
                 EXECUTE
               </Button>
               </ScrollView>
