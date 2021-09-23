@@ -40,11 +40,13 @@ class AppWrapper extends Component {
     menuVisible: false,
     settingsVisible: true,
     scannerModalVisible: false,
+    mlModalVisible: false,
     autocompleteInput: '',
     selectedDevice: '',
     dateRange: '',
     selectedFunction: new IndexPath(0),
-    selectedBucket: new IndexPath(0)
+    selectedBucket: new IndexPath(0),
+    mlResult: undefined
   };
 
   getRotationFactor = () => {
@@ -104,6 +106,15 @@ class AppWrapper extends Component {
     }));
   }
 
+  changeMlModalVisibility = (visible) => {
+    this.setState(() => ({
+      mlModalVisible: visible
+    }));
+    if (!visible) {
+      this.mlResult = undefined;
+    }
+  }
+
   startDataStream() {
     //mocking data stream
     setInterval(() => this.props.dispatch(
@@ -131,19 +142,22 @@ class AppWrapper extends Component {
   sendMLRequest = () => {
     fetch('https://bkepd4nn2g.execute-api.eu-central-1.amazonaws.com/Testing/test', {
       method: 'POST',
-    //  mode: "no-cors",
+      mode: "cors", // "no-cors",
       body: JSON.stringify({
       //  "data": "21.76,21.260000" // returns 1
         "data": "11.76,21.260000" // returns 0
       }),
-      headers: {
-        "Accept": '*/*',
-        'Content-Type': 'application/json'
-      },
+   //   headers: {
+   //     "Accept": '*/*',
+    //    'Content-Type': 'application/json',
+    //    "Access-Control-Allow-Origin": "*",
+    //    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+   //   },
     })
-      .then((response) => {
-        alert(response);
-        console.log(response);
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.mlResult = responseJson;
+        this.changeMlModalVisibility(true);
       })
       .catch((error) => {
         alert(JSON.stringify(error));
@@ -284,8 +298,15 @@ class AppWrapper extends Component {
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ScrollView>
-              { false &&
-              <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button> }
+              <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button>
+              <Modal 
+                visible={this.state.mlModalVisible}
+                backdropStyle={styles.backdrop}>
+                  <Card disabled={true}>
+                    <Text style={{paddingBottom: 30}}>Result from ML backend: {this.mlResult}</Text>
+                    <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
+                  </Card>
+              </Modal>
             { dataAvailable && 
               <LineChart
                 verticalLabelRotation={this.getRotationFactor()}
