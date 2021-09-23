@@ -33,7 +33,8 @@ import ScannerWrapper from './ScannerWrapper';
 
 class AppWrapper extends Component {
 
-  colorConstant = '#222b45';
+  colorConstantBackground = '#222b45';
+  colorConstantElements = '#8F9BB3'
 
   state = {
     menuVisible: false,
@@ -125,7 +126,7 @@ class AppWrapper extends Component {
     let dataAvailable = false;
 
     const IconBuilder = (props, icon) => (
-      <Icon {...props} name={icon} fill='#8F9BB3'/>
+      <Icon {...props} name={icon} fill={this.colorConstantElements}/>
     );
 
     const SettingsButton = (props) => (
@@ -138,15 +139,18 @@ class AppWrapper extends Component {
     );
 
     const chartConfig = {
-      backgroundGradientFrom: isDark ? this.colorConstant: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
+      backgroundGradientFrom: isDark ? this.colorConstantBackground: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientFromOpacity: 1,
-      backgroundGradientTo: isDark ? this.colorConstant: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
+      backgroundGradientTo: isDark ? this.colorConstantBackground: "#FFFFFF", // ui kitten color dark: 'background-basic-color-1' (light: #FFFFFF)
       backgroundGradientToOpacity: 1,
       fillShadowGradient: isDark ? "#F7F9FC": "#2E3A59", // ui kitten color dark: 'color-basic-200' - light: 'color-basic-700' (#2E3A59)
       // ui kitten color dark: 'color-info-100' (#F2F8FF) - light: 'color-info-900' (#002885)
       color: (opacity = 1) => isDark ? `rgba(242, 248, 255, ${opacity})` : `rgba(0, 40, 133, ${opacity})`,
       barPercentage: 0.5,
-      useShadowColorFromDataset: false // optional
+      useShadowColorFromDataset: false, // optional
+      propsForLabels: {
+        fontFamily: 'Helvetica'
+      }
     };
 
     let dataTemperature = {
@@ -213,8 +217,8 @@ class AppWrapper extends Component {
 
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
-        <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? this.colorConstant : 'white'}>
-          <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? this.colorConstant : 'white'}></StatusBar>
+        <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? this.colorConstantBackground : 'white'}>
+          <StatusBar style={!isDark ? 'dark' : 'light' } translucent={true} backgroundColor={isDark ? this.colorConstantBackground : 'white'}></StatusBar>
         </View>
         <Layout style={{flexDirection: 'row'}}>
           <Text style={{marginLeft: 20}} category='h1'>TemHu</Text>
@@ -259,13 +263,13 @@ class AppWrapper extends Component {
           </Layout>
           <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
             style={{
-              backgroundColor: isDark ? this.colorConstant : 'white',
+              backgroundColor: isDark ? this.colorConstantBackground : 'white',
               height: this.state.settingsVisible ? 350 : 80,
               borderTopWidth: 2,
               borderTopColor: '#222735',
               boxShadow: '0px -20px 20px 0px #0000003d'
             }}>
-            <Icon style={styles.autocomplete} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill='#8F9BB3'/>
+            <Icon style={styles.autocomplete} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill={this.colorConstantElements}/>
             {this.state.settingsVisible ?
             <Layout style={{margin: 20}}>
               <ScrollView>
@@ -283,7 +287,7 @@ class AppWrapper extends Component {
                   <Button 
                     onPress={() => this.changeScannerModalVisibility(true)}
                     appearance='outline' size='small'>
-                    Scan QR Code
+                      Scan QR Code
                   </Button>
                   <Modal
                     visible={this.state.scannerModalVisible}
