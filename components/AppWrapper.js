@@ -22,19 +22,24 @@ import {
   SelectItem,
   Modal,
   Card,
-  IndexPath } from '@ui-kitten/components';
+  IndexPath,
+  Spinner } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
-import { addDataPoint } from '../actions/data'
+import { addDataPoint, addHumDataPoint, addTemDataPoint } from '../actions/data'
 import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import ScannerWrapper from './ScannerWrapper';
 
 class AppWrapper extends Component {
 
+  // constants
   colorConstantBackground = '#222b45';
-  colorConstantElements = '#8F9BB3'
+  colorConstantElements = '#8F9BB3';
+  backendUrl = 'http://aws-aspnetcore-api-env.eba-wtax5dtp.eu-west-1.elasticbeanstalk.com/api/v1/time-series?';
+  functions = ['Avg', 'Min', 'Max'];
+  buckets = ['ThirtyMinutes'];
 
   state = {
     menuVisible: false,
@@ -46,7 +51,8 @@ class AppWrapper extends Component {
     dateRange: '',
     selectedFunction: new IndexPath(0),
     selectedBucket: new IndexPath(0),
-    mlResult: undefined
+    mlResult: undefined,
+    loading: false
   };
 
   getRotationFactor = () => {
@@ -117,6 +123,12 @@ class AppWrapper extends Component {
       this.mlResult = undefined;
     }
   }
+  
+  changeLoading = (loading) => {
+    this.setState(() => ({
+      loading: loading
+    }));
+  }
 
   startDataStream() {
     //mocking data stream
@@ -140,6 +152,40 @@ class AppWrapper extends Component {
         })
       );
     }
+  }
+
+  requestData() {
+    this.changeLoading(true);
+    fetch(`${this.backendUrl}BucketSize=${this.buckets[this.state.selectedBucket - 1]}&ArithmeticFunction=${this.functions[this.state.selectedFunction - 1]}`, {
+      method: 'GET',
+      headers: {
+        "Accept": '*/*',
+        'Content-Type': 'application/json'
+      },
+    })
+    .then((response) => response.json()).then(data => {
+      data.humidityDataPoints.forEach(hum => {
+        this.props.dispatch(
+          addHumDataPoint({
+            timestamp: hum.loggedAt,
+            humidity: hum.value
+          })
+        );
+      });
+      data.temperatureDataPoints.forEach(tem => {
+        this.props.dispatch(
+          addTemDataPoint({
+            timestamp: tem.loggedAt,
+            temperature: tem.value
+          })
+        );
+        this.changeLoading(false);
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      this.changeLoading(false);
+    });
   }
 
   sendMLRequest = () => {
@@ -221,9 +267,9 @@ class AppWrapper extends Component {
       legend: ["Temperature", "Humidity"]
     };
 
-    if (this.props.data.data && this.props.data.data.length > 0) {
+    if (this.props.dataTem && this.props.dataHum) {
       dataAvailable = true;
-      const labels = this.props.data.data.map(a => {
+      const labels = this.props.dataTem.map(a => {
         const date = new Date(a.timestamp);
         const hours = ('0' + date.getHours()).slice(-2);
         const minutes = ('0' + date.getMinutes()).slice(-2);
@@ -232,10 +278,10 @@ class AppWrapper extends Component {
         return dateString;
       });
       dataTemperature.labels = labels.slice(labels.length - 15);
-      const tempData = this.props.data.data.map(a => a.temperature);
+      const tempData = this.props.dataTem.map(a => a.temperature);
       dataTemperature.datasets[0].data = tempData.slice(tempData.length - 15);
 
-      const dataHum = this.props.data.data.map(a => a.humidity);
+      const dataHum = this.props.dataHum.map(a => a.humidity);
       dataTemperature.datasets[1].data = dataHum.slice(dataHum.length - 15);
     }
 
@@ -310,16 +356,23 @@ class AppWrapper extends Component {
                     <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
                   </Card>
               </Modal>
-            { dataAvailable && 
-              <LineChart
-                verticalLabelRotation={this.getRotationFactor()}
-                style={styles.lineChart}
-                data={dataTemperature}
-                width={screenWidth}
-                height={400}
-                chartConfig={chartConfig}
-              />
-            }
+              { false &&
+              <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button> }
+              { dataAvailable && !this.state.loading &&
+                <LineChart
+                  verticalLabelRotation={this.getRotationFactor()}
+                  style={styles.lineChart}
+                  data={dataTemperature}
+                  width={screenWidth}
+                  height={400}
+                  chartConfig={chartConfig}
+                />
+              }
+              { this.state.loading &&
+                <Layout style={{marginTop: 300}}>
+                  <Spinner size='giant'/>
+                </Layout>
+              }
             </ScrollView>
           </Layout>
           <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
@@ -366,10 +419,9 @@ class AppWrapper extends Component {
                 <Select
                   selectedIndex={this.state.selectedBucket}
                   onSelect={index => this.changeSelectedBucket(index)}
-                  style={{marginBottom: 10}}>
-                  <SelectItem title='Option 1'/>
-                  <SelectItem title='Option 2'/>
-                  <SelectItem title='Option 3'/>
+                  style={{marginBottom: 10}}
+                  value={this.buckets[this.state.selectedBucket - 1]}>
+                  {this.buckets.map(bucket => <SelectItem title={bucket}/>)}
                 </Select>
                 <RangeDatepicker
                   range={this.state.dateRange}
@@ -380,12 +432,11 @@ class AppWrapper extends Component {
                 <Select
                   selectedIndex={this.state.selectedFunction}
                   onSelect={index => this.changeSelectedFunction(index)}
-                  style={{marginTop: 10}}>
-                  <SelectItem title='Option 1'/>
-                  <SelectItem title='Option 2'/>
-                  <SelectItem title='Option 3'/>
+                  style={{marginTop: 10}}
+                  value={this.functions[this.state.selectedFunction - 1]}>
+                  {this.functions.map(func => <SelectItem title={func}/>)}
                 </Select>
-                <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.batchData()} disabled={this.state.dateRange === ''}>
+                <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.requestData()} disabled={this.state.dateRange === ''}>
                   EXECUTE
                 </Button>
               </ScrollView>
@@ -433,6 +484,8 @@ function mapStateToProps ({settings, data}) {
   return {
     isDark: settings.isDark,
     data: data,
+    dataHum: data.dataHum,
+    dataTem: data.dataTem,
     devices: data.devices
   }
 }

@@ -1,5 +1,4 @@
-import { ADD_DATA_POINT } from "../actions/data";
-import { ADD_DEVICE } from "../actions/data";
+import { ADD_DATA_POINT, ADD_HUM_DATA_POINT, ADD_TEM_DATA_POINT, ADD_DEVICE } from "../actions/data";
 
 export default function settings(state = {}, action) {
     switch(action.type) {
@@ -9,6 +8,18 @@ export default function settings(state = {}, action) {
                 data = state.data;
             }
             return { ...state, data: [...data, action.data] };
+        case ADD_HUM_DATA_POINT:
+            let dataHum = []
+            if(state.dataHum) {
+                dataHum = state.dataHum;
+            }
+            return { ...state, dataHum: [...dataHum, action.dataHum] };
+        case ADD_TEM_DATA_POINT:
+            let dataTem = []
+            if(state.dataTem) {
+                dataTem = state.dataTem;
+            }
+            return { ...state, dataTem: [...dataTem, action.dataTem] };
         case ADD_DEVICE:
             let devices = []
             if(state.devices) {
