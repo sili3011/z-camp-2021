@@ -111,6 +111,30 @@ class AppWrapper extends Component {
     }
   }
 
+  sendMLRequest = () => {
+    fetch('https://bkepd4nn2g.execute-api.eu-central-1.amazonaws.com/Testing/test', {
+      method: 'POST',
+    //  mode: "no-cors",
+      body: JSON.stringify({
+      //  "data": "21.76,21.260000" // returns 1
+        "data": "11.76,21.260000" // returns 0
+      }),
+      headers: {
+        "Accept": '*/*',
+        'Content-Type': 'application/json'
+      },
+    })
+      .then((response) => {
+        alert(response);
+        console.log(response);
+      })
+      .catch((error) => {
+        alert(JSON.stringify(error));
+        console.error(error);
+      });
+  }
+  
+
   render() {
     const isDark = this.props.isDark;
     const screenWidth = Dimensions.get("window").width;
@@ -237,6 +261,8 @@ class AppWrapper extends Component {
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ScrollView>
+              { false &&
+              <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button> }
             { dataAvailable && 
               <LineChart
                 verticalLabelRotation={70}
