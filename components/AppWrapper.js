@@ -45,6 +45,14 @@ class AppWrapper extends Component {
     dateRange: '',
     selectedFunction: new IndexPath(0),
     selectedBucket: new IndexPath(0)
+  };
+
+  getRotationFactor = () => {
+    let rotationFactor = undefined;
+    if (Platform.OS === 'ios' || Platform.OS === 'android') {
+      rotationFactor = 70;
+    }
+    return rotationFactor;
   }
 
   changeMenuVisibility = (visible) => {
@@ -280,7 +288,7 @@ class AppWrapper extends Component {
               <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button> }
             { dataAvailable && 
               <LineChart
-                verticalLabelRotation={70}
+                verticalLabelRotation={this.getRotationFactor()}
                 style={styles.lineChart}
                 data={dataTemperature}
                 width={screenWidth}
