@@ -22,7 +22,9 @@ import {
   SelectItem,
   Modal,
   Card,
-  IndexPath } from '@ui-kitten/components';
+  IndexPath, 
+  List, 
+  ListItem } from '@ui-kitten/components';
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
@@ -142,20 +144,15 @@ class AppWrapper extends Component {
     }
   }
 
-  sendMLRequest = () => {
+  sendMLRequest = (data) => {
     fetch('https://bkepd4nn2g.execute-api.eu-central-1.amazonaws.com/Testing/test', {
       method: 'POST',
-      mode: "cors", // "no-cors",
+      mode: "cors",
       body: JSON.stringify({
-      //  "data": "21.76,21.260000" // returns 1
-        "data": "11.76,21.260000" // returns 0
+      //  "data": "21.76,21.260000" // test data - returns 1
+      //  "data": "11.76,21.260000" // test data - returns 0
+        data: data
       }),
-   //   headers: {
-   //     "Accept": '*/*',
-    //    'Content-Type': 'application/json',
-    //    "Access-Control-Allow-Origin": "*",
-    //    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
-   //   },
     })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -264,6 +261,33 @@ class AppWrapper extends Component {
       />
     }
 
+    const listData = dataTemperature.labels.map((labelElement, index) => {
+      const label = dataTemperature.labels[index];
+      const temperature = dataTemperature.datasets[0].data[index];
+      const humidity = dataTemperature.datasets[1].data[index];
+      const data = `${temperature},${humidity}`;
+      const item = {
+        title: `Time: ${label}`,
+        description: `Temperature: ${temperature}, Humidity; ${humidity}`,
+        data: data
+      };
+      return item;
+    });
+
+    const renderItemAccessory = (listItem) => (
+      <Button size='tiny' onPress={() => this.sendMLRequest(listItem.data)}>
+        check maschine learning result
+      </Button>
+    );
+
+    const renderItem = ({ item }) => (
+      <ListItem
+        title={`${item.title}`}
+        description={`${item.description}`}
+        accessoryRight={() => renderItemAccessory(item)}
+      />
+    );
+
     return (
       <ApplicationProvider {...eva} theme={isDark ? eva.dark : eva.light}>
         <View style={{height: Constants.statusBarHeight}} backgroundColor={isDark ? this.colorConstantBackground : 'white'}>
@@ -301,25 +325,31 @@ class AppWrapper extends Component {
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ScrollView>
-              <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button>
-              <Modal 
-                visible={this.state.mlModalVisible}
-                backdropStyle={styles.backdrop}>
-                  <Card disabled={true}>
-                    <Text style={{paddingBottom: 30}}>Result from ML backend: {this.mlResult}</Text>
-                    <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
-                  </Card>
-              </Modal>
-            { dataAvailable && 
-              <LineChart
-                verticalLabelRotation={this.getRotationFactor()}
-                style={styles.lineChart}
-                data={dataTemperature}
-                width={screenWidth}
-                height={400}
-                chartConfig={chartConfig}
-              />
-            }
+              { dataAvailable && 
+                <View>
+                  <LineChart
+                    verticalLabelRotation={this.getRotationFactor()}
+                    style={styles.lineChart}
+                    data={dataTemperature}
+                    width={screenWidth}
+                    height={400}
+                    chartConfig={chartConfig}
+                  />
+                  <List
+                    style={styles.listContainer}
+                    data={listData}
+                    renderItem={renderItem}
+                  />
+                  <Modal 
+                  visible={this.state.mlModalVisible}
+                  backdropStyle={styles.backdrop}>
+                    <Card disabled={true}>
+                      <Text style={{paddingBottom: 30}}>Result from ML backend: {this.mlResult}</Text>
+                      <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
+                    </Card>
+                </Modal>
+                </View>
+              }
             </ScrollView>
           </Layout>
           <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
@@ -426,7 +456,8 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginBottom: 10,
     fontSize: 10
-  }
+  },
+  listContainer: {}
 });
 
 function mapStateToProps ({settings, data}) {
