@@ -12,8 +12,8 @@ import { addDevice } from './actions/data';
 export default class App extends Component {
 
   componentDidMount() {
+    this.store.dispatch(toggleDarkMode(true));
     if(__DEV__) {
-      this.store.dispatch(toggleDarkMode(true));
       //mock devices
       for(let i = 0; i < 5; ++i) {
         this.store.dispatch(addDevice(`${i}-00-${i}`));
