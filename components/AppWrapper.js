@@ -424,7 +424,7 @@ class AppWrapper extends Component {
               borderTopWidth: 2,
               borderTopColor: '#222735',
               boxShadow: '0px -20px 20px 0px #0000003d',
-              position: 'absolute',
+              position: 'fixed',
               bottom: 0,
               width: screenWidth -5
             }}>
