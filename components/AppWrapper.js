@@ -41,7 +41,7 @@ class AppWrapper extends Component {
   colorConstantElements = '#8F9BB3';
   backendUrl = 'http://aws-aspnetcore-api-env.eba-wtax5dtp.eu-west-1.elasticbeanstalk.com/api/v1/time-series?';
   functions = ['Avg', 'Min', 'Max'];
-  buckets = ['ThirtyMinutes'];
+  buckets = ['FiveMinutes', 'FifteenMinutes', 'ThirtyMinutes', 'OneHour', 'FourHours', 'EightHours', 'TwelveHours', 'OneDay'];
 
   state = {
     menuVisible: false,
@@ -158,7 +158,7 @@ class AppWrapper extends Component {
 
   requestData() {
     this.changeLoading(true);
-    fetch(`${this.backendUrl}BucketSize=${this.buckets[this.state.selectedBucket - 1]}&ArithmeticFunction=${this.functions[this.state.selectedFunction - 1]}`, {
+    fetch(`${this.backendUrl}BucketSize=${this.buckets[this.state.selectedBucket - 1]}&ArithmeticFunction=${this.functions[this.state.selectedFunction - 1]}&From=${new Date(this.state.dateRange.startDate).toISOString().split('T')[0]}&To=${new Date(this.state.dateRange.endDate).toISOString().split('T')[0]}`, {
       method: 'GET',
       headers: {
         "Accept": '*/*',
@@ -372,17 +372,32 @@ class AppWrapper extends Component {
           <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ScrollView>
               { dataAvailable && !this.state.loading &&
-                <LineChart
-                  verticalLabelRotation={this.getRotationFactor()}
-                  style={styles.lineChart}
-                  data={dataTemperature}
-                  width={screenWidth}
-                  height={400}
-                  chartConfig={chartConfig}
-                />
+                <View>
+                  <LineChart
+                    verticalLabelRotation={this.getRotationFactor()}
+                    style={styles.lineChart}
+                    data={dataTemperature}
+                    width={screenWidth}
+                    height={400}
+                    chartConfig={chartConfig}
+                  />
+                  <List
+                    style={styles.listContainer}
+                    data={listData}
+                    renderItem={renderItem}
+                  />
+                  <Modal 
+                    visible={this.state.mlModalVisible}
+                    backdropStyle={styles.backdrop}>
+                    <Card disabled={true}>
+                      <Text style={{paddingBottom: 30}}>Result from ML backend: {this.mlResult}</Text>
+                      <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
+                    </Card>
+                  </Modal>
+                </View>
               }
               { this.state.loading &&
-                <Layout style={{marginTop: 300}}>
+                <Layout style={{marginTop: 300, alignItems: 'center'}}>
                   <Spinner size='giant'/>
                 </Layout>
               // { dataAvailable && 
@@ -409,6 +424,7 @@ class AppWrapper extends Component {
               //       </Card>
               //   </Modal>
               //   </View>
+
               }
             </ScrollView>
           </Layout>
