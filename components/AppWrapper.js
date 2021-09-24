@@ -423,7 +423,10 @@ class AppWrapper extends Component {
               height: this.state.settingsVisible ? 350 : 80,
               borderTopWidth: 2,
               borderTopColor: '#222735',
-              boxShadow: '0px -20px 20px 0px #0000003d'
+              boxShadow: '0px -20px 20px 0px #0000003d',
+              position: 'absolute',
+              bottom: 0,
+              width: screenWidth
             }}>
             <Icon style={styles.autocomplete} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill={this.colorConstantElements}/>
             {this.state.settingsVisible ?
