@@ -29,7 +29,7 @@ import {
 import { toggleDarkMode } from '../actions/settings';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
-import { addDataPoint, addHumDataPoint, addTemDataPoint } from '../actions/data'
+import { addDataPoint, addHumDataPoint, addTemDataPoint, resetDataPoints } from '../actions/data'
 import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import ScannerWrapper from './ScannerWrapper';
@@ -158,6 +158,9 @@ class AppWrapper extends Component {
 
   requestData() {
     this.changeLoading(true);
+    this.props.dispatch(
+      resetDataPoints()
+    );
     fetch(`${this.backendUrl}BucketSize=${this.buckets[this.state.selectedBucket - 1]}&ArithmeticFunction=${this.functions[this.state.selectedFunction - 1]}&From=${new Date(this.state.dateRange.startDate).toISOString().split('T')[0]}&To=${new Date(this.state.dateRange.endDate).toISOString().split('T')[0]}`, {
       method: 'GET',
       headers: {
@@ -372,7 +375,7 @@ class AppWrapper extends Component {
           </Popover>
         </Layout>
         <KeyboardAvoidingView style={{flex: 1, overflow: 'hidden'}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
-          <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 90}}>
             <ScrollView>
               { dataAvailable && !this.state.loading &&
                 <View>
