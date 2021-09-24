@@ -161,7 +161,7 @@ class AppWrapper extends Component {
     this.props.dispatch(
       resetDataPoints()
     );
-    fetch(`${this.backendUrl}BucketSize=${this.buckets[this.state.selectedBucket - 1]}&ArithmeticFunction=${this.functions[this.state.selectedFunction - 1]}&From=${new Date(this.state.dateRange.startDate).toISOString().split('T')[0]}&To=${new Date(this.state.dateRange.endDate).toISOString().split('T')[0]}`, {
+    fetch(`${this.backendUrl}BucketSize=${this.buckets[this.state.selectedBucket - 1]}&ArithmeticFunction=${this.functions[this.state.selectedFunction - 1]}&From=${(new Date(this.state.dateRange.startDate)).getFullYear()}-${(new Date(this.state.dateRange.startDate)).getMonth()+1}-${(new Date(this.state.dateRange.startDate)).getDate()}&To=${(new Date(this.state.dateRange.endDate)).getFullYear()}-${(new Date(this.state.dateRange.endDate)).getMonth()+1}-${(new Date(this.state.dateRange.endDate)).getDate()}`, {
       method: 'GET',
       headers: {
         "Accept": '*/*',
