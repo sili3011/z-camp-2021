@@ -371,17 +371,6 @@ class AppWrapper extends Component {
         <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ScrollView>
-              <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button>
-              <Modal 
-                visible={this.state.mlModalVisible}
-                backdropStyle={styles.backdrop}>
-                  <Card disabled={true}>
-                    <Text style={{paddingBottom: 30}}>Result from ML backend: {this.mlResult}</Text>
-                    <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
-                  </Card>
-              </Modal>
-              { false &&
-              <Button onPress={() => this.sendMLRequest()}>POST data to ML backend</Button> }
               { dataAvailable && !this.state.loading &&
                 <LineChart
                   verticalLabelRotation={this.getRotationFactor()}
@@ -415,7 +404,7 @@ class AppWrapper extends Component {
               //     visible={this.state.mlModalVisible}
               //     backdropStyle={styles.backdrop}>
               //       <Card disabled={true}>
-              //         <Text style={{paddingBottom: 30}}>Result from ML backend: {this.mlResult}</Text>
+              //         <Text style={{paddingBottom: 30}}>ML result: {this.mlResult}</Text>
               //         <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
               //       </Card>
               //   </Modal>
@@ -526,7 +515,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 10
   },
-  listContainer: {}
+  listContainer: {
+    paddingTop: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 10
+  }
 });
 
 function mapStateToProps ({settings, data}) {
