@@ -410,6 +410,11 @@ class AppWrapper extends Component {
                   <Spinner size='giant'/>
                 </Layout>
               }
+              { !this.state.loading && (this.props.dataHum?.length === 0 || this.props.dataTen?.length === 0 || !this.props.dataHum || !this.props.dataTem) &&
+                <Layout style={{marginTop: 300, alignItems: 'center'}}>
+                  <Text status='basic' category='h4'>No data available. Please execute a query</Text>
+                </Layout>
+              }
             </ScrollView>
           </Layout>
           <TouchableOpacity onPress={() => this.changeSettingsVisibility(!this.state.settingsVisible)}
