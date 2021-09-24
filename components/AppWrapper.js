@@ -268,10 +268,13 @@ class AppWrapper extends Component {
       dataAvailable = true;
       const labels = this.props.dataTem.map(a => {
         const date = new Date(a.timestamp);
+        const day = ('0' + date.getDate()).slice(-2);
+        const month = ('0' + date.getMonth()).slice(-2);
+        const year = date.getFullYear();
         const hours = ('0' + date.getHours()).slice(-2);
         const minutes = ('0' + date.getMinutes()).slice(-2);
         const seconds = ('0' + date.getSeconds()).slice(-2);
-        const dateString = `${hours}:${minutes}:${seconds}`;
+        const dateString = `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
         return dateString;
       });
       dataTemperature.labels = labels.slice(labels.length - 15);
