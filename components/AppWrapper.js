@@ -181,8 +181,8 @@ class AppWrapper extends Component {
             temperature: tem.value
           })
         );
-        this.changeLoading(false);
       });
+      this.changeLoading(false);
     })
     .catch((error) => {
       console.error(error);
@@ -458,7 +458,7 @@ class AppWrapper extends Component {
                   onSelect={index => this.changeSelectedBucket(index)}
                   style={{marginBottom: 10}}
                   value={this.buckets[this.state.selectedBucket - 1]}>
-                  {this.buckets.map(bucket => <SelectItem title={bucket}/>)}
+                  {this.buckets.map(bucket => <SelectItem key={Object.keys(this.buckets).indexOf(bucket)} title={bucket}/>)}
                 </Select>
                 <RangeDatepicker
                   range={this.state.dateRange}
@@ -471,7 +471,7 @@ class AppWrapper extends Component {
                   onSelect={index => this.changeSelectedFunction(index)}
                   style={{marginTop: 10}}
                   value={this.functions[this.state.selectedFunction - 1]}>
-                  {this.functions.map(func => <SelectItem title={func}/>)}
+                  {this.functions.map(func => <SelectItem key={Object.keys(this.functions).indexOf(func)} title={func}/>)}
                 </Select>
                 <Button appearance='outline' style={{alignSelf: 'center', width: 150, marginTop: 10}} onPress={() => this.requestData()} disabled={this.state.dateRange === ''}>
                   EXECUTE
