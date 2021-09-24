@@ -381,7 +381,7 @@ class AppWrapper extends Component {
                     style={styles.lineChart}
                     data={dataTemperature}
                     width={screenWidth}
-                    height={400}
+                    height={520}
                     chartConfig={chartConfig}
                   />
                   <List
