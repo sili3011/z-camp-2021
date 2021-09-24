@@ -322,7 +322,7 @@ class AppWrapper extends Component {
 
     const renderItemAccessory = (listItem) => (
       <Button size='tiny' onPress={() => this.sendMLRequest(listItem.data)}>
-        check maschine learning result
+        check maschine learning
       </Button>
     );
 
@@ -390,7 +390,13 @@ class AppWrapper extends Component {
                     visible={this.state.mlModalVisible}
                     backdropStyle={styles.backdrop}>
                     <Card disabled={true}>
-                      <Text style={{paddingBottom: 30}}>Result from ML backend: {this.mlResult}</Text>
+                      <Text style={{paddingBottom: 30}}>ML result: {this.mlResult}</Text>
+                      { this.mlResult === 1 &&
+                        <Text style={{paddingBottom: 30}}>There appears to be a person in the room</Text>
+                      }
+                      { this.mlResult === 0 &&
+                        <Text style={{paddingBottom: 30}}>The room appears to be empty.</Text>
+                      }
                       <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
                     </Card>
                   </Modal>
@@ -400,31 +406,6 @@ class AppWrapper extends Component {
                 <Layout style={{marginTop: 300, alignItems: 'center'}}>
                   <Spinner size='giant'/>
                 </Layout>
-              // { dataAvailable && 
-              //   <View>
-              //     <LineChart
-              //       verticalLabelRotation={this.getRotationFactor()}
-              //       style={styles.lineChart}
-              //       data={dataTemperature}
-              //       width={screenWidth}
-              //       height={400}
-              //       chartConfig={chartConfig}
-              //     />
-              //     <List
-              //       style={styles.listContainer}
-              //       data={listData}
-              //       renderItem={renderItem}
-              //     />
-              //     <Modal 
-              //     visible={this.state.mlModalVisible}
-              //     backdropStyle={styles.backdrop}>
-              //       <Card disabled={true}>
-              //         <Text style={{paddingBottom: 30}}>ML result: {this.mlResult}</Text>
-              //         <Button onPress={() => this.changeMlModalVisibility(false)}>Dismiss</Button>
-              //       </Card>
-              //   </Modal>
-              //   </View>
-
               }
             </ScrollView>
           </Layout>
