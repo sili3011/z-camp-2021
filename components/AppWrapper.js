@@ -371,7 +371,7 @@ class AppWrapper extends Component {
             </Layout>
           </Popover>
         </Layout>
-        <KeyboardAvoidingView style={{flex: 1}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <KeyboardAvoidingView style={{flex: 1, overflow: 'hidden'}} behavior={Platform.OS === "ios" ? "padding" : "height"}>
           <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ScrollView>
               { dataAvailable && !this.state.loading &&
@@ -426,7 +426,7 @@ class AppWrapper extends Component {
               boxShadow: '0px -20px 20px 0px #0000003d',
               position: 'absolute',
               bottom: 0,
-              width: screenWidth
+              width: screenWidth -5
             }}>
             <Icon style={styles.autocomplete} name={this.state.settingsVisible ? 'arrow-circle-down-outline' : 'arrow-circle-up-outline'} fill={this.colorConstantElements}/>
             {this.state.settingsVisible ?
