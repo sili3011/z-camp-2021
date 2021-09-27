@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+import { BarCodeScanner, BarcodeMask } from 'expo-barcode-scanner';
 
 export default function CameraWrapper({onIDDetected})  {
   const [hasPermission, setHasPermission] = useState(null);
